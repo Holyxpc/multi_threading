@@ -13,7 +13,7 @@
 
 - 一个简单的C++多线程程序是怎么样的
 
-[清单1.1 一个简单的Hello,Cuncurrent World程序](https://github.com/xuyicpp/multi_threading/blob/master/chapter01/example1_1.cpp)
+[清单1.1 一个简单的Hello,Cuncurrent World程序](https://github.com/Holyxpc/multi_threading/blob/master/chapter01/example1_1.cpp)
 
 ## 第二章
 - 启动线程，以及让各种代码在新线程上运行的方法
