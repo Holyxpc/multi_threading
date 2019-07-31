@@ -46,11 +46,11 @@ std::thread是支持移动的，如同std::unique_ptr是可移动的，而非可
 2.修改数据结构的设计及其不变量，从而令修改作为一系列不可分割的变更来完成，每个修改均保留其不变量。者通常被称为无锁编程，且难以尽善尽美。
 
 - 用互斥元保护数据
-在[清单3.1 用互斥元保护列表](https://github.com/xuyicpp/multi_threading/blob/master/chapter03/example3_1.cpp)中，有一个全局变量，它被相应的std::mutex的全局实例保护。在add_to_list()以及list_contains()中对std::lock_guard<std::mutex>的使用意味着这些函数中的访问是互斥的list_contains()将无法再add_to_list()进行修改的半途看到该表。
+在[清单3.1 用互斥元保护列表](https://github.com/Holyxpc/multi_threading/blob/master/chapter03/example3_1.cpp)中，有一个全局变量，它被相应的std::mutex的全局实例保护。在add_to_list()以及list_contains()中对std::lock_guard<std::mutex>的使用意味着这些函数中的访问是互斥的list_contains()将无法再add_to_list()进行修改的半途看到该表。
 
-注意：一个迷路的指针或引用，所有的保护都将白费。在[清单3.2 意外地传出对受保护数据的引用](https://github.com/xuyicpp/multi_threading/blob/master/chapter03/example3_2.cpp)展示了这一个错误的做法。
+注意：一个迷路的指针或引用，所有的保护都将白费。在[清单3.2 意外地传出对受保护数据的引用](https://github.com/Holyxpc/multi_threading/blob/master/chapter03/example3_2.cpp)展示了这一个错误的做法。
 
-发现接口中固有的竞争条件，这是一个粒度锁定的问题，就是说锁定从语句上升到接口了，书中用一个stack类做了一个扩展，详见[清单3.5 一个线程安全栈的详细类定义](https://github.com/xuyicpp/multi_threading/blob/master/chapter03/example3_5.cpp)
+发现接口中固有的竞争条件，这是一个粒度锁定的问题，就是说锁定从语句上升到接口了，书中用一个stack类做了一个扩展，详见[清单3.5 一个线程安全栈的详细类定义](https://github.com/Holyxpc/multi_threading/blob/master/chapter03/example3_5.cpp)
 
 死锁：问题和解决方案:为了避免死锁，常见的建议是始终使用相同的顺序锁定者两个互斥元。
 std::lock函数可以同时锁定两个或更多的互斥元，而没有死锁的风险。
@@ -58,12 +58,12 @@ std::lock函数可以同时锁定两个或更多的互斥元，而没有死锁�
 - 避免嵌套锁
 - 在持有锁时，避免调用用户提供的代码
 - 以固定顺序获取锁
-这里有几个简单的事例：[清单3.7 使用锁层次来避免死锁](https://github.com/xuyicpp/multi_threading/blob/master/chapter03/example3_7.cpp)、[清单3.9 用std::unique_lock灵活锁定](https://github.com/xuyicpp/multi_threading/blob/master/chapter03/example3_9.cpp)
+这里有几个简单的事例：[清单3.7 使用锁层次来避免死锁](https://github.com/Holyxpc/multi_threading/blob/master/chapter03/example3_7.cpp)、[清单3.9 用std::unique_lock灵活锁定](https://github.com/Holyxpc/multi_threading/blob/master/chapter03/example3_9.cpp)
 
 锁定在恰当的粒度
 特别的，在持有锁时，不要做任何耗时的活动，比如文件的I/O。
 一般情况下，只应该以执行要求的操作所需的最小可能时间而去持有锁。这也意味着耗时的操作，比如获取获取另一个锁（即便你知道它不会死锁）或是等待I/O完成，都不应该在持有锁的时候去做，除非绝对必要。
-在[清单3.10 在比较运算符中每次锁定一个互斥元](https://github.com/xuyicpp/multi_threading/blob/master/chapter03/example3_10.cpp)虽然减少了持有锁的时间，但是也暴露在竞争条件中去了。
+在[清单3.10 在比较运算符中每次锁定一个互斥元](https://github.com/Holyxpc/multi_threading/blob/master/chapter03/example3_10.cpp)虽然减少了持有锁的时间，但是也暴露在竞争条件中去了。
 
 - 用于保护共享数据的替代工具
 二次检测锁定模式，注意这个和单例模式中的饱汉模式不一样，它后面有对数据的使用
@@ -83,46 +83,46 @@ void undefined_behaviour_with_double_checked_locking()
 ```
 它有可能产生恶劣的竞争条件，因为在锁外部的读取与锁内部由另一线程完成的写入不同步。这就因此创建了一个竞争条件，不仅涵盖了指针本身，还涵盖了指向的对象。
 
-C++标准库提供了std::once_flag和std::call_once来处理这种情况。使用std::call_once比显示使用互斥元通常会由更低的开销，特别是初始化已经完成的时候，应优先使用。[清单3.12 使用std::call_once的线程安全的类成员延迟初始化](https://github.com/xuyicpp/multi_threading/blob/master/chapter03/example3_12.cpp)
+C++标准库提供了std::once_flag和std::call_once来处理这种情况。使用std::call_once比显示使用互斥元通常会由更低的开销，特别是初始化已经完成的时候，应优先使用。[清单3.12 使用std::call_once的线程安全的类成员延迟初始化](https://github.com/Holyxpc/multi_threading/blob/master/chapter03/example3_12.cpp)
 
 保护很少更新的数据结构：例如DNS缓存，使用读写互斥元：单个“写”线程独占访问或共享，由多个“读”线程并发访问。
-[清单3.13 使用boost::share_mutex保护数据结构](https://github.com/xuyicpp/multi_threading/blob/master/chapter03/example3_13.cpp)
+[清单3.13 使用boost::share_mutex保护数据结构](https://github.com/Holyxpc/multi_threading/blob/master/chapter03/example3_13.cpp)
 
 ## 第4章 同步并发操作
 - 等待事件
 
 使用C++标准库提供的工具来等待事件本身。std::condition_variable的std::condition_variable_any，后者可以与任何互斥元一起工作，所以有额外代价的可能。
 std::condition_variable可以调用notify_one()和notify_all()。然后std::condition_variable还可以wait(lk,[this]{return !data_queue.empty();}),这里的lk是unique_lock方便后面条件不满足的时候解锁，满足时开锁。
-[清单4.1 使用std::condition_variable等待数据](https://github.com/xuyicpp/multi_threading/blob/master/chapter04/example4_01.cpp)
+[清单4.1 使用std::condition_variable等待数据](https://github.com/Holyxpc/multi_threading/blob/master/chapter04/example4_01.cpp)
 
-使用条件变量建立一个线程安全队列：[清单4.2 std::queue接口](https://github.com/xuyicpp/multi_threading/blob/master/chapter04/example4_02.cpp)、[清单4.4 从清单4.1中提取push()和wait_and_pop()](https://github.com/xuyicpp/multi_threading/blob/master/chapter04/example4_04.cpp)。
+使用条件变量建立一个线程安全队列：[清单4.2 std::queue接口](https://github.com/Holyxpc/multi_threading/blob/master/chapter04/example4_02.cpp)、[清单4.4 从清单4.1中提取push()和wait_and_pop()](https://github.com/Holyxpc/multi_threading/blob/master/chapter04/example4_04.cpp)。
 
 - 使用future来等待一次性事件
 
 在一个线程不需要立刻得到结果的时候，你可以使用std::async来启动一个异步任务。std::async返回一个std::future对象，而不是给你一个std::thread对象让你在上面等待，std::future对象最终将持有函数的返回值，当你需要这个值时，只要在future上调用get(),线程就会阻塞知道future就绪，然后返回该值。
-[清单4.6 使用std::future获取异步任务的返回值](https://github.com/xuyicpp/multi_threading/blob/master/chapter04/example4_06.cpp)
+[清单4.6 使用std::future获取异步任务的返回值](https://github.com/Holyxpc/multi_threading/blob/master/chapter04/example4_06.cpp)
 
 std::async允许你通过将额外的参数添加到调用中，来将附加参数传递给函数，这与std::thread是同样的方式。
-[清单4.7 使用std::async来将参数传递给函数](https://github.com/xuyicpp/multi_threading/blob/master/chapter04/example4_07.cpp)
+[清单4.7 使用std::async来将参数传递给函数](https://github.com/Holyxpc/multi_threading/blob/master/chapter04/example4_07.cpp)
 
 std::packaged_task<>将一个future绑定到一个函数或可调用对象上。当std::packaged_task<>对象被调用时，它就调用相关联的函数或可调用对象，并且让future就绪，将返回值作为关联数据存储。
-[清单4.9 使用std::packaged_task在GUI线程上运行代码](https://github.com/xuyicpp/multi_threading/blob/master/chapter04/example4_09.cpp)
+[清单4.9 使用std::packaged_task在GUI线程上运行代码](https://github.com/Holyxpc/multi_threading/blob/master/chapter04/example4_09.cpp)
 
 std::promise<T>提供一种设置值（类型T）方式，它可以在这之后通过相关联的std::future<T>对象进行读取。
-[清单4.10 使用promise在单个线程中处理多个链接](https://github.com/xuyicpp/multi_threading/blob/master/chapter04/example4_10.cpp)，这个有点像select,或者poll。
+[清单4.10 使用promise在单个线程中处理多个链接](https://github.com/Holyxpc/multi_threading/blob/master/chapter04/example4_10.cpp)，这个有点像select,或者poll。
 
 同时，还要为future保存异常，以及使用share_future等待来自多个线程。
 
 - 有时间限制的等待
 
 1.基于时间段的超时。2.基于时间点的超时。
-[清单4.11 等待一个具有超时的条件变量](https://github.com/xuyicpp/multi_threading/blob/master/chapter04/example4_11.cpp)
+[清单4.11 等待一个具有超时的条件变量](https://github.com/Holyxpc/multi_threading/blob/master/chapter04/example4_11.cpp)
 
 - 使用操作的同步来简化代码
 
 解决同步问题的范式，函数式编程，其中每个任务产生的结果完全依赖于它的输入而不是外部环境，以及消息传递，ATM状态机，线程通信通过状态发送一部消息来实现的。
-[清单4.13 使用future的并行快速排序](https://github.com/xuyicpp/multi_threading/blob/master/chapter04/example4_13.cpp)、
-[清单4.15 ATM逻辑类的简单实现](https://github.com/xuyicpp/multi_threading/blob/master/chapter04/example4_15.cpp)。
+[清单4.13 使用future的并行快速排序](https://github.com/Holyxpc/multi_threading/blob/master/chapter04/example4_13.cpp)、
+[清单4.15 ATM逻辑类的简单实现](https://github.com/Holyxpc/multi_threading/blob/master/chapter04/example4_15.cpp)。
 
 ## 第5章 C++内存模型和原子类型上操作
  
@@ -137,17 +137,17 @@ std::promise<T>提供一种设置值（类型T）方式，它可以在这之后�
 所有操作的默认顺序为memory_order_seq_cst。
 
 原子操作的内存顺序的三种模型：
-- 顺序一致顺序(sequentially consistent):(memory_order_seq_cst):[清单5.4 顺序一致隐含着总体顺序](https://github.com/xuyicpp/multi_threading/blob/master/chapter05/example5_04.cpp)。
-- 松散顺序(relaxed):(memory_order_relaxed):[清单5.6 多线程的松散操作](https://github.com/xuyicpp/multi_threading/blob/master/chapter05/example5_06.cpp)。
-- 获取-释放顺序(acquire-release):(memory_order_consume、memory_order_acquire、memory_order_release和memory_order_acq_rel):[清单5.9 使用获取和释放顺序的传递性同步](https://github.com/xuyicpp/multi_threading/blob/master/chapter05/example5_09.cpp)、[清单5.10 使用std::memory_order_consume同步数据(原子载入操作指向某数据的指针)](https://github.com/xuyicpp/multi_threading/blob/master/chapter05/example5_10.cpp)
+- 顺序一致顺序(sequentially consistent):(memory_order_seq_cst):[清单5.4 顺序一致隐含着总体顺序](https://github.com/Holyxpc/multi_threading/blob/master/chapter05/example5_04.cpp)。
+- 松散顺序(relaxed):(memory_order_relaxed):[清单5.6 多线程的松散操作](https://github.com/Holyxpc/multi_threading/blob/master/chapter05/example5_06.cpp)。
+- 获取-释放顺序(acquire-release):(memory_order_consume、memory_order_acquire、memory_order_release和memory_order_acq_rel):[清单5.9 使用获取和释放顺序的传递性同步](https://github.com/Holyxpc/multi_threading/blob/master/chapter05/example5_09.cpp)、[清单5.10 使用std::memory_order_consume同步数据(原子载入操作指向某数据的指针)](https://github.com/Holyxpc/multi_threading/blob/master/chapter05/example5_10.cpp)
 
 synchronizes-with(与同步):
-- 在原子变量的载入和来自另一个线程的对该原子变量的载入之间，建立一个synchronizes-with关系，[清单5.11 使用原子操作从队列中读取值](https://github.com/xuyicpp/multi_threading/blob/master/chapter05/example5_11.cpp)
-- 在一个线程中释放屏障，在另一个线程中获取屏障，从而实现synchronizes-with关系，[清单5.12 松散操作可以使用屏障来排序](https://github.com/xuyicpp/multi_threading/blob/master/chapter05/example5_12.cpp)
+- 在原子变量的载入和来自另一个线程的对该原子变量的载入之间，建立一个synchronizes-with关系，[清单5.11 使用原子操作从队列中读取值](https://github.com/Holyxpc/multi_threading/blob/master/chapter05/example5_11.cpp)
+- 在一个线程中释放屏障，在另一个线程中获取屏障，从而实现synchronizes-with关系，[清单5.12 松散操作可以使用屏障来排序](https://github.com/Holyxpc/multi_threading/blob/master/chapter05/example5_12.cpp)
 
 happens-before(发生于之前):传递性：如果A线程发生于B线程之前，并且B线程发生于C之前，则A线程间发生于C之前。
-- [清单5.8 获取-释放操作可以在松散操作中施加顺序](https://github.com/xuyicpp/multi_threading/blob/master/chapter05/example5_08.cpp)
-- [清单5.13 在非原子操作上强制顺序](https://github.com/xuyicpp/multi_threading/blob/master/chapter05/example5_13.cpp)
+- [清单5.8 获取-释放操作可以在松散操作中施加顺序](https://github.com/Holyxpc/multi_threading/blob/master/chapter05/example5_08.cpp)
+- [清单5.13 在非原子操作上强制顺序](https://github.com/Holyxpc/multi_threading/blob/master/chapter05/example5_13.cpp)
 
 ## 第六章 设计基于锁的并发数据结构
 
@@ -167,13 +167,13 @@ happens-before(发生于之前):传递性：如果A线程发生于B线程之前�
 
 
 - 使用锁的线程安全栈
-[清单6.1 线程安全栈的类定义](https://github.com/xuyicpp/multi_threading/blob/master/chapter06/example6_01.cpp)
+[清单6.1 线程安全栈的类定义](https://github.com/Holyxpc/multi_threading/blob/master/chapter06/example6_01.cpp)
 - 使用细粒度锁和条件变量的线程安全队列
-[清单6.7 使用锁和等待的线程安全队列：内部与接口](https://github.com/xuyicpp/multi_threading/blob/master/chapter06/example6_07.cpp)
+[清单6.7 使用锁和等待的线程安全队列：内部与接口](https://github.com/Holyxpc/multi_threading/blob/master/chapter06/example6_07.cpp)
 - 一个使用锁的线程安全查找表
-[清单6.11 线程安全查找表](https://github.com/xuyicpp/multi_threading/blob/master/chapter06/example6_11.cpp)
+[清单6.11 线程安全查找表](https://github.com/Holyxpc/multi_threading/blob/master/chapter06/example6_11.cpp)
 - 一个使用锁的线程安全链表
-[清单6.13 支持迭代的线程安全链表](https://github.com/xuyicpp/multi_threading/blob/master/chapter06/example6_13.cpp)
+[清单6.13 支持迭代的线程安全链表](https://github.com/Holyxpc/multi_threading/blob/master/chapter06/example6_13.cpp)
 
 ## 第七章 设计无锁的并发数据结构
 
@@ -185,7 +185,7 @@ happens-before(发生于之前):传递性：如果A线程发生于B线程之前�
 
 使用互斥元，条件变量以及future来同步数据的算法和数据结构被称为阻塞(blocking)的算法和数据结构。不使用阻塞库函数的数据结构和算法被称为非阻塞(nonblocking)的。但是，并不是所有的数据结构都是无锁(lock-free)的。
 
-[清单7.1 使用std::atomic_flag的自旋锁互斥元的实现](https://github.com/xuyicpp/multi_threading/blob/master/chapter07/example7_01.cpp)这段代码，没有阻塞调用。然而，它并非无锁的。它仍然是一个互斥元，并且一次仍然只能被一个线程锁定。
+[清单7.1 使用std::atomic_flag的自旋锁互斥元的实现](https://github.com/Holyxpc/multi_threading/blob/master/chapter07/example7_01.cpp)这段代码，没有阻塞调用。然而，它并非无锁的。它仍然是一个互斥元，并且一次仍然只能被一个线程锁定。
 
 对于有资格称为无锁的数据结构，就必须能够让多余一个线程可以并发地访问次数据结构。
 
@@ -254,25 +254,25 @@ void processing_loop()
 - 用并发提高响应性
 
 ### 在实践中设计并发代码
-- std::for_each的并行实现:[清单8.7 std::for_each的并行版本](https://github.com/xuyicpp/multi_threading/blob/master/chapter08/example8_07.cpp)、[清单8.8 使用std::async的std::for_each的并行版本](https://github.com/xuyicpp/multi_threading/blob/master/chapter08/example8_08.cpp)
-- std::find的并行实现:[清单8.9 并行find算法的一种实现](https://github.com/xuyicpp/multi_threading/blob/master/chapter08/example8_09.cpp)、[清单8.10 使用std::async的并行查找算法的实现](https://github.com/xuyicpp/multi_threading/blob/master/chapter08/example8_10.cpp)
-- std::partial_sum的并行实现:[清单8.11 通过划分问题来并行计算分段的和](https://github.com/xuyicpp/multi_threading/blob/master/chapter08/example8_11.cpp)、[清单8.13 通过成对更新的partial_sum的并行实现](https://github.com/xuyicpp/multi_threading/blob/master/chapter08/example8_13.cpp)
-- 屏障(barrier):一种同步方法使得线程等待直到要求的线程已经到达了屏障。[清单8.12 一个简单的屏障类](https://github.com/xuyicpp/multi_threading/blob/master/chapter08/example8_12.cpp)
+- std::for_each的并行实现:[清单8.7 std::for_each的并行版本](https://github.com/Holyxpc/multi_threading/blob/master/chapter08/example8_07.cpp)、[清单8.8 使用std::async的std::for_each的并行版本](https://github.com/Holyxpc/multi_threading/blob/master/chapter08/example8_08.cpp)
+- std::find的并行实现:[清单8.9 并行find算法的一种实现](https://github.com/Holyxpc/multi_threading/blob/master/chapter08/example8_09.cpp)、[清单8.10 使用std::async的并行查找算法的实现](https://github.com/Holyxpc/multi_threading/blob/master/chapter08/example8_10.cpp)
+- std::partial_sum的并行实现:[清单8.11 通过划分问题来并行计算分段的和](https://github.com/Holyxpc/multi_threading/blob/master/chapter08/example8_11.cpp)、[清单8.13 通过成对更新的partial_sum的并行实现](https://github.com/Holyxpc/multi_threading/blob/master/chapter08/example8_13.cpp)
+- 屏障(barrier):一种同步方法使得线程等待直到要求的线程已经到达了屏障。[清单8.12 一个简单的屏障类](https://github.com/Holyxpc/multi_threading/blob/master/chapter08/example8_12.cpp)
 
 ## 第9章 高级线程管理
 
 本章,我们考虑了许多“高级的“线程管理方法：线程池和中断线程。
 
-- [清单9.1 简单的线程池](https://github.com/xuyicpp/multi_threading/blob/master/chapter09/example9_01.cpp)
-- [清单9.9 interruptible_thread的基本实现](https://github.com/xuyicpp/multi_threading/blob/master/chapter09/example9_09.cpp)
+- [清单9.1 简单的线程池](https://github.com/Holyxpc/multi_threading/blob/master/chapter09/example9_01.cpp)
+- [清单9.9 interruptible_thread的基本实现](https://github.com/Holyxpc/multi_threading/blob/master/chapter09/example9_09.cpp)
 
 你已经看到使用本地工作队列如何减少同步管理以及潜在提高线程池的吞吐量，
 
-- [清单9.6 使用本地线程工作队列的线程池](https://github.com/xuyicpp/multi_threading/blob/master/chapter09/example9_06.cpp)
+- [清单9.6 使用本地线程工作队列的线程池](https://github.com/Holyxpc/multi_threading/blob/master/chapter09/example9_06.cpp)
 
 并且看到当等待子任务完成时如何运行队列中别的任务来减少发生死锁的可能性。
 
-- [清单9.8 使用工作窃取的线程池](https://github.com/xuyicpp/multi_threading/blob/master/chapter09/example9_08.cpp)
+- [清单9.8 使用工作窃取的线程池](https://github.com/Holyxpc/multi_threading/blob/master/chapter09/example9_08.cpp)
 
 我们也考虑了许多方法来允许一个线程中断另一个线程的处理，例如使用特殊中断点
 ```
